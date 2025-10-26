@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rafi Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body{font-family:'Segoe UI','Nirmala UI',sans-serif;background:linear-gradient(135deg,#764ba2,#667eea);margin:0;padding:0;min-height:100vh;color:#333;}
+    .admin-box{max-width:600px;margin:40px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+    h1{text-align:center;color:#333;}
+    label{font-weight:600;display:block;margin-top:10px;}
+    input,textarea{width:100%;padding:10px;margin-top:5px;border-radius:8px;border:1px solid #ccc;font-size:1rem;}
+    button{margin-top:15px;background:#667eea;color:white;padding:12px;width:100%;border:none;border-radius:10px;font-size:1rem;cursor:pointer;font-weight:600;}
+    button:hover{background:#764ba2;}
+    .app-list{margin-top:20px;}
+    .app-item{background:#f9f9f9;padding:10px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+    .app-item span{font-weight:500;}
+    .delete-btn{background:#e53e3e;color:white;padding:5px 10px;border:none;border-radius:5px;cursor:pointer;}
+  </style>
+</head>
+<body>
+
+  <div class="admin-box">
+    <h1>🔧 Rafi Admin Panel</h1>
+
+    <label>অ্যাপের নাম:</label>
+    <input type="text" id="appName" placeholder="অ্যাপের নাম লিখুন">
+
+    <label>বিবরণ:</label>
+    <textarea id="appDesc" rows="3" placeholder="অ্যাপটি কী কাজ করে তা লিখুন"></textarea>
+
+    <label>ডাউনলোড লিংক:</label>
+    <input type="text" id="appLink" placeholder="যেমন: https://example.com/download/app">
+
+    <button onclick="addApp()"><i class="fas fa-plus"></i> অ্যাপ যোগ করুন</button>
+
+    <div class="app-list" id="adminAppList"></div>
+  </div>
+
+  <script>
+    let apps = JSON.parse(localStorage.getItem("rafiApps") || "[]");
+    const adminAppList = document.getElementById("adminAppList");
+
+    function addApp() {
+      const name = document.getElementById("appName").value.trim();
+      const desc = document.getElementById("appDesc").value.trim();
+      const link = document.getElementById("appLink").value.trim();
+
+      if(!name || !desc || !link){
+        alert("সব ঘর পূরণ করুন!");
+        return;
+      }
+
+      const newApp = { name, description: desc, link };
+      apps.push(newApp);
+      localStorage.setItem("rafiApps", JSON.stringify(apps));
+      renderAdminApps();
+
+      document.getElementById("appName").value = "";
+      document.getElementById("appDesc").value = "";
+      document.getElementById("appLink").value = "";
+    }
+
+    function deleteApp(index){
+      if(confirm("এই অ্যাপটি মুছতে চান?")){
+        apps.splice(index,1);
+        localStorage.setItem("rafiApps", JSON.stringify(apps));
+        renderAdminApps();
+      }
+    }
+
+    function renderAdminApps(){
+      if(apps.length === 0){
+        adminAppList.innerHTML = "<p>এখনও কোনো অ্যাপ যোগ করা হয়নি।</p>";
+        return;
+      }
+      adminAppList.innerHTML = apps.map((app,i)=>`
+        <div class="app-item">
+          <span>${app.name}</span>
+          <button class="delete-btn" onclick="deleteApp(${i})"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('');
+    }
+
+    renderAdminApps();
+  </script>
+</body>
+</html>
